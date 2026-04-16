@@ -1,6 +1,7 @@
-<p align="center">
-  <img src="./public/logo.svg" width="80" height="80" alt="CareerCoach Logo" />
-</p># <p align="center">CareerCoach</p>
+<h1 align="center">
+  <img src="./public/logo.svg" width="30" height="25" alt="CareerCoach Logo" style="vertical-align: middle;">
+  CareerCoach
+</h1>
 
 Your AI-powered interview partner.
 
