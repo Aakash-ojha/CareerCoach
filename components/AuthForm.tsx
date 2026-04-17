@@ -123,7 +123,7 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
             className="w-9 h-9 rounded-lg bg-black flex items-center justify-center p-1"
           />
 
-          <h2 className="text-xl font-bold">CarrerCoach</h2>
+          <h2 className="text-xl font-bold">CareerCoach</h2>
         </div>
         <h3 className="text-sm text-slate-400">
           Your AI-powered interview partner
