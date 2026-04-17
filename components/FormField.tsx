@@ -9,6 +9,7 @@ interface FormFieldProps<T extends FieldValues> {
   label: string;
   placeholder?: string;
   type?: "text" | "email" | "password";
+  autoComplete: string;
 }
 
 const FormField = <T extends FieldValues>({
@@ -17,12 +18,13 @@ const FormField = <T extends FieldValues>({
   label,
   placeholder,
   type = "text",
+  autoComplete,
 }: FormFieldProps<T>) => {
   return (
     <Controller
       control={control}
       name={name}
-      render={({ field }) => {
+      render={({ field, fieldState: { error } }) => {
         return (
           <Field>
             <FieldLabel className="text-light-100!  font-normal!">
@@ -33,7 +35,12 @@ const FormField = <T extends FieldValues>({
               placeholder={placeholder}
               {...field}
               className="input"
+              autoComplete={autoComplete}
             />
+
+            {error && (
+              <p className="text-red-500 text-xs mt-1 px-5">{error.message}</p>
+            )}
           </Field>
         );
       }}

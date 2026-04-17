@@ -8,33 +8,106 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import FormField from "./FormField";
 import Link from "next/link";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-const formSchema = z
-  .object({
-    name: z
-      .string()
-      .min(2, "Bug title must be at least 2 characters.")
-      .max(32, "Bug title must be at most 32 characters."),
+type AuthPageType = "sign-in" | "sign-up";
 
-    email: z.string().email("Invalid email address"),
+const authformSchema = (typed: AuthPageType) => {
+  return z
+    .object({
+      name:
+        typed === "sign-up"
+          ? z
+              .string()
+              .min(2, "Name must be at least 2 characters.")
+              .max(32, "Name must be at most 32 characters.")
+          : z.string().optional(),
 
-    password: z.string().min(8, "Password must be at least 8 characters."),
+      email: z.string().email("Invalid email address"),
 
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+      password: z.string().min(8, "Password must be at least 8 characters."),
 
-type AuthFormPage = "sign-in" | "sign-up";
+      confirmPassword: z.string().optional(),
+    })
+    .refine(
+      (data) => {
+        if (typed === "sign-up") {
+          return data.password === data.confirmPassword;
+        }
+        return true;
+      },
+      {
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
+      },
+    );
+};
 
-const AuthForm = ({ typed }: { typed: AuthFormPage }) => {
+const AuthForm = ({ typed }: { typed: AuthPageType }) => {
+  const router = useRouter();
+  const formSchema = authformSchema(typed);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
-  function onSubmit() {}
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      if (typed === "sign-up") {
+        const res = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+          }),
+        });
+        const result = await res.json();
+
+        if (!res.ok) {
+          toast.error(result.message || "Signup failed");
+          return;
+        }
+
+        toast.success("Account created successfully. Please sign in.");
+        router.push("/sign-in");
+      } else if (typed === "sign-in") {
+        const res = await fetch("/api/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+          toast.error(result.message || "Login failed");
+          return;
+        }
+        toast.success("Successfully signed in");
+        router.push("/");
+      }
+    } catch (err) {
+      console.log(err);
+
+      toast.error(`There was an error : ${err}`);
+    }
+  }
 
   const isSignUp = typed === "sign-up";
 
@@ -68,6 +141,7 @@ const AuthForm = ({ typed }: { typed: AuthFormPage }) => {
             label="Name"
             placeholder="Enter your Name"
             type="text"
+            autoComplete="name"
           />
         )}
 
@@ -77,6 +151,7 @@ const AuthForm = ({ typed }: { typed: AuthFormPage }) => {
           label="Email"
           placeholder="Your email address"
           type="email"
+          autoComplete="email"
         />
         <div className="flex flex-col gap-3">
           <FormField
@@ -85,6 +160,7 @@ const AuthForm = ({ typed }: { typed: AuthFormPage }) => {
             label="Password"
             placeholder="Enter your password"
             type="password"
+            autoComplete={isSignUp ? "new-password" : "current-password"}
           />
           {isSignUp ? (
             ""
@@ -106,11 +182,15 @@ const AuthForm = ({ typed }: { typed: AuthFormPage }) => {
               label="ConfirmPassword"
               placeholder="Enter your password"
               type="password"
+              autoComplete="new-password"
             />
           </>
         )}
 
-        <Button className="w-full h-10 border border-slate-200 rounded-full text-sm text-slate-700 flex items-center justify-center gap-2.5 font-bold hover:bg-slate-50 transition-colors mt-2 cursor-pointer">
+        <Button
+          type="submit"
+          className="w-full h-10 border border-slate-200 rounded-full text-sm text-slate-700 flex items-center justify-center gap-2.5 font-bold hover:bg-slate-50 transition-colors mt-2 cursor-pointer"
+        >
           {isSignUp ? "Create Account" : "Login"}
         </Button>
       </form>
