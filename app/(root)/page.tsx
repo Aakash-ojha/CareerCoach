@@ -58,7 +58,7 @@ export default function Home() {
               />
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
                 Master Your{" "}
-                <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                   Interview Skills
                 </span>
               </h1>

@@ -100,6 +100,7 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
           return;
         }
         toast.success("Successfully signed in");
+        router.refresh();
         router.push("/");
       }
     } catch (err) {
