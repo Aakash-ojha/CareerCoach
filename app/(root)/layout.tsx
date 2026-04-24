@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import UserMenu from "@/components/UserMenu";
 
 import React, { ReactNode } from "react";
 
@@ -27,7 +28,9 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
             <h2 className="text-xl font-bold tracking-tight ">CareerCoach</h2>
           </Link>
 
-          <div className="flex items-center gap-4"></div>
+          <div className="flex items-center gap-4">
+            <UserMenu />
+          </div>
         </nav>
       </header>
 
