@@ -1,201 +1,105 @@
 "use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import InterviewConfigModal from "./InterviewConfigModal";
 
-const categories = [
-  {
-    title: "IT Field",
-    topics: [
-      "Frontend Development",
-      "Backend Development",
-      "Full Stack",
-      "Machine Learning",
-      "Data Science",
-      "Cybersecurity",
-      "Cloud Computing",
-    ],
-  },
-  {
-    title: "Programming Languages",
-    topics: ["JavaScript", "TypeScript", "Python", "Java", "C++", "SQL"],
-  },
-  {
-    title: "Academic Subjects",
-    topics: ["Math", "Physics", "Statistics", "Logical Reasoning"],
-  },
-];
-
-export default function TopicSelectionPage() {
+export default function TopicSelectionPage({
+  onStart,
+}: {
+  onStart: (topic: string, domain: string) => void;
+}) {
+  const [groupedCategories, setGroupedCategories] = useState<
+    Record<string, string[]>
+  >({});
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleContinue = async () => {
-    if (!selectedTopic) return;
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-    try {
-      setLoading(true);
-
-      const res = await fetch("/api/interview/start", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          selectedTopic,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
+  useEffect(() => {
+    async function fetchTopics() {
+      try {
+        const res = await fetch("/api/topics"); //
+        const data = await res.json();
+        setGroupedCategories(data);
+      } catch (err) {
+        console.error("Failed to load topics", err);
+      } finally {
+        setLoading(false);
       }
-
-      router.push(`/interview?topic=${encodeURIComponent(selectedTopic)}`);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to start interview");
-    } finally {
-      setLoading(false);
     }
-  };
+    fetchTopics();
+  }, []);
+
+  if (loading)
+    return (
+      <div className="flex h-screen items-center justify-center text-blue-500">
+        Loading Interview Tracks...
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white px-6 py-10">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight">
-            Choose Your Interview Track
-          </h1>
-          <p className="text-gray-400 mt-4 text-lg">
-            Select your preferred topic and start your AI-powered mock interview
-          </p>
-        </div>
+        <h1 className="text-4xl font-black text-center mb-12">
+          Choose Your Interview Topic
+        </h1>
 
-        <div className="space-y-10">
-          {categories.map((category) => (
-            <div key={category.title}>
-              <h2 className="text-2xl font-bold mb-5 text-blue-400">
-                {category.title}
+        <div className="space-y-12">
+          {Object.entries(groupedCategories).map(([domain, topics]) => (
+            <div key={domain}>
+              <h2 className="text-2xl font-bold mb-6 text-blue-400 border-l-4 border-blue-500 pl-4">
+                {domain}
               </h2>
-
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {category.topics.map((topic) => {
-                  const active = selectedTopic === topic;
-
-                  return (
-                    <motion.button
-                      key={topic}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setSelectedTopic(topic)}
-                      className={`p-6 rounded-3xl border transition-all text-left shadow-xl ${
-                        active
-                          ? "border-blue-500 bg-blue-500/10"
-                          : "border-gray-800 bg-[#141414] hover:border-gray-600"
-                      }`}
-                    >
-                      <h3 className="text-xl font-bold">{topic}</h3>
-                      <p className="text-sm text-gray-400 mt-2">
-                        Practice focused interview questions for {topic}
-                      </p>
-                    </motion.button>
-                  );
-                })}
+                {topics.map((topic) => (
+                  <motion.button
+                    key={topic}
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => {
+                      setIsModalOpen(true);
+                      setSelectedTopic(topic);
+                      setSelectedDomain(domain);
+                    }}
+                    className={`p-6 rounded-3xl border transition-all text-left ${
+                      selectedTopic === topic
+                        ? "border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
+                        : "border-gray-800 bg-[#141414] hover:border-gray-600"
+                    }`}
+                  >
+                    <h3 className="text-xl font-bold">{topic}</h3>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Practice {topic} interview questions.
+                    </p>
+                  </motion.button>
+                ))}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-14 flex justify-center">
+        <div className="mt-16 flex justify-center">
           <button
-            onClick={handleContinue}
-            disabled={!selectedTopic || loading}
-            className="px-10 py-4 rounded-full font-black uppercase tracking-wider bg-white text-black hover:bg-blue-500 hover:text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={() =>
+              selectedTopic &&
+              selectedDomain &&
+              onStart(selectedTopic, selectedDomain)
+            }
+            disabled={!selectedTopic}
+            className="px-12 py-4 rounded-full font-black uppercase tracking-widest bg-blue-600 text-white hover:bg-blue-500 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
           >
-            {loading
-              ? "Starting Interview..."
-              : selectedTopic
-                ? `Continue with ${selectedTopic}`
-                : "Select a Topic First"}
+            Start {selectedTopic || "Interview"}
           </button>
         </div>
+
+        {isModalOpen && (
+          <InterviewConfigModal
+            isModelOpen={isModalOpen}
+            setIsModelOpen={setIsModalOpen}
+          />
+        )}
       </div>
     </div>
   );
 }
-
-/*
-Create this API route:
-
-app/api/interview/start/route.ts
-
---------------------------------------------------
-
-import { NextResponse } from "next/server";
-
-const allowedTopics = [
-  "Frontend Development",
-  "Backend Development",
-  "Full Stack",
-  "Machine Learning",
-  "Data Science",
-  "Cybersecurity",
-  "Cloud Computing",
-  "JavaScript",
-  "TypeScript",
-  "Python",
-  "Java",
-  "C++",
-  "SQL",
-  "Math",
-  "Physics",
-  "Statistics",
-  "Logical Reasoning",
-];
-
-export async function POST(req: Request) {
-  try {
-    const { selectedTopic } = await req.json();
-
-    if (!selectedTopic) {
-      return NextResponse.json(
-        { error: "Please select a topic" },
-        { status: 400 }
-      );
-    }
-
-    if (!allowedTopics.includes(selectedTopic)) {
-      return NextResponse.json(
-        { error: "Invalid topic selected" },
-        { status: 400 }
-      );
-    }
-
-    // Later save to DB here using Prisma
-
-    return NextResponse.json({
-      success: true,
-      selectedTopic,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
-    );
-  }
-}
-
---------------------------------------------------
-
-Paste frontend file inside:
-
-app/select-topic/page.tsx
-
-Then visit:
-
-http://localhost:3000/select-topic
-*/

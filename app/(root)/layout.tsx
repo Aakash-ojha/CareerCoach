@@ -34,7 +34,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
         </nav>
       </header>
 
-      <main className="flex-1 max-w-7xl mx-auto w-full p-6">{children}</main>
+      <main className="flex-1 w-full px-6 md:px-10 lg:px-16">{children}</main>
 
       <footer className="py-6 text-center text-sm text-slate-500 border-t ">
         © {new Date().getFullYear()} CareerCoach. All rights reserved.
