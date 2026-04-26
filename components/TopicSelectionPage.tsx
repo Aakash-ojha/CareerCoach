@@ -97,6 +97,7 @@ export default function TopicSelectionPage({
           <InterviewConfigModal
             isModelOpen={isModalOpen}
             setIsModelOpen={setIsModalOpen}
+            selectedTopic={selectedTopic}
           />
         )}
       </div>

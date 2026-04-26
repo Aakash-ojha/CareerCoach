@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import TopicSelectionPage from "@/components/TopicSelectionPage"; // Your selection UI
-import InterviewSession from "@/components/InterviewSession"; // Your live session UI
+import InterviewSession from "@/app/(root)/interview/session/[id]/page"; // Your live session UI
 import EvaluationReport from "@/components/EvaluationReport"; // Your scorecard UI
 
 export default function InterviewPage() {
