@@ -65,14 +65,8 @@ const InterviewConfigModal = ({
       if (!res.ok) {
         throw new Error(data.error || "Something went wrong");
       }
-
-      // close modal
       setIsModelOpen(false);
-
-      // move to interview page
-      // later you can use:
-      // router.push(`/interview/${data.sessionId}`);
-      router.push("/interview/session");
+      router.push(`/interview/session/${data.sessionId}`);
     } catch (error) {
       console.log("ERROR:", error);
     } finally {
