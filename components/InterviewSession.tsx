@@ -163,7 +163,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
       <main className="flex flex-1 items-center justify-center gap-10">
         {/* AI */}
         {/* AI */}
-        <div className="w-[600px] h-[400px] rounded-xl overflow-hidden bg-zinc-900/50 text-white flex flex-col items-center justify-center">
+        <div className="w-150 h-[400px] rounded-xl overflow-hidden bg-zinc-900/50 text-white flex flex-col items-center justify-center">
           <motion.div
             animate={{ scale: isSpeaking ? [1, 1.1, 1] : 1 }}
             transition={{ repeat: Infinity, duration: 2 }}
