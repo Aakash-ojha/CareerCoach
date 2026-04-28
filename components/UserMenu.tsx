@@ -29,8 +29,8 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="w-10 h-10 rounded-full overflow-hidden">
-          <Avatar className="w-full h-full">
+        <button className="h-10 w-10 overflow-hidden rounded-full">
+          <Avatar className="h-full w-full">
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>

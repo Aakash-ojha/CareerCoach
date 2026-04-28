@@ -51,8 +51,6 @@ const InterviewConfigModal = ({
     setTopicInput(selectedTopic || "");
   }, [selectedTopic]);
 
-  // If topic is selected from cards → readonly
-  // If custom/manual topic → editable
   const isSelectedTopic = !!selectedTopic;
 
   const handleSubmit = async (e: FormEvent) => {
@@ -98,7 +96,7 @@ const InterviewConfigModal = ({
 
   return (
     <Dialog open={isModelOpen} onOpenChange={setIsModelOpen}>
-      <DialogContent className="sm:max-w-lg bg-[#0f0f0f] text-white border-gray-800">
+      <DialogContent className="border-gray-800 bg-[#0f0f0f] text-white sm:max-w-lg">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
@@ -120,7 +118,7 @@ const InterviewConfigModal = ({
               </Label>
 
               <Input
-                className="bg-[#1a1a1a] border-gray-700 mt-2 focus:ring-blue-500"
+                className="mt-2 border-gray-700 bg-[#1a1a1a] focus:ring-blue-500"
                 placeholder="e.g. Senior Frontend Engineer, Rust Basics"
                 value={topicInput}
                 onChange={(e) => setTopicInput(e.target.value)}
@@ -131,7 +129,7 @@ const InterviewConfigModal = ({
 
             {/* DIFFICULTY */}
             <Field>
-              <Label className="text-sm font-medium text-gray-300 mb-3 block">
+              <Label className="mb-3 block text-sm font-medium text-gray-300">
                 Expertise Level
               </Label>
 
@@ -144,14 +142,14 @@ const InterviewConfigModal = ({
                   <label
                     key={level}
                     htmlFor={level}
-                    className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                    className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-all ${
                       difficulty === level
-                        ? "bg-blue-500/10 border-blue-500"
-                        : "bg-[#1a1a1a] border-gray-800"
+                        ? "border-blue-500 bg-blue-500/10"
+                        : "border-gray-800 bg-[#1a1a1a]"
                     }`}
                   >
                     <div className="flex flex-col">
-                      <span className="capitalize font-bold">{level}</span>
+                      <span className="font-bold capitalize">{level}</span>
 
                       <span className="text-xs text-gray-500">
                         {level === "beginner" && "Foundational concepts"}
@@ -172,7 +170,7 @@ const InterviewConfigModal = ({
 
             {/* TIME */}
             <Field>
-              <Label className="text-sm font-medium text-gray-300 mb-3 block">
+              <Label className="mb-3 block text-sm font-medium text-gray-300">
                 Duration
               </Label>
 
@@ -184,10 +182,10 @@ const InterviewConfigModal = ({
                 {["10", "15", "30"].map((t) => (
                   <label
                     key={t}
-                    className={`flex-1 flex items-center justify-center py-2 rounded-lg border cursor-pointer transition-all ${
+                    className={`flex flex-1 cursor-pointer items-center justify-center rounded-lg border py-2 transition-all ${
                       time === t
-                        ? "bg-green-500 border-green-400 text-white"
-                        : "bg-[#1a1a1a] border-gray-800 text-white"
+                        ? "border-green-400 bg-green-500 text-white"
+                        : "border-gray-800 bg-[#1a1a1a] text-white"
                     }`}
                   >
                     <span className="text-sm font-bold">{t} Min</span>
@@ -204,7 +202,7 @@ const InterviewConfigModal = ({
               <Button
                 type="button"
                 variant="ghost"
-                className="text-white border border-green-500 hover:text-white"
+                className="border border-green-500 text-white hover:text-white"
               >
                 Cancel
               </Button>
@@ -212,7 +210,7 @@ const InterviewConfigModal = ({
 
             <Button
               type="submit"
-              className="bg-green-600 hover:bg-green-500 text-white px-8"
+              className="bg-green-600 px-8 text-white hover:bg-green-500"
               disabled={loading || !topicInput.trim()}
             >
               {loading ? "Preparing..." : "Start Interview"}

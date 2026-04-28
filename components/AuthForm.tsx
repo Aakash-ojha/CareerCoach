@@ -113,15 +113,15 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
   const isSignUp = typed === "sign-up";
 
   return (
-    <div className="py-4 px-4 border-2 rounded-2xl w-100">
-      <div className="flex flex-col gap-2 mb-8 items-center">
-        <div className="flex flex-row gap-2 justify-center items-center">
+    <div className="w-100 rounded-2xl border-2 px-4 py-4">
+      <div className="mb-8 flex flex-col items-center gap-2">
+        <div className="flex flex-row items-center justify-center gap-2">
           <Image
             src="/logo.svg"
             alt="logo"
             height={18}
             width={18}
-            className="w-9 h-9 rounded-lg bg-black flex items-center justify-center p-1"
+            className="flex h-9 w-9 items-center justify-center rounded-lg bg-black p-1"
           />
 
           <h2 className="text-xl font-bold">CareerCoach</h2>
@@ -133,7 +133,7 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
 
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full space-y-6 mt-4 form"
+        className="form mt-4 w-full space-y-6"
       >
         {isSignUp && (
           <FormField
@@ -168,7 +168,7 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
           ) : (
             <Link
               href="/"
-              className="text-sm justify-end flex text-slate-200 hover:text-white"
+              className="flex justify-end text-sm text-slate-200 hover:text-white"
             >
               Forget Password?
             </Link>
@@ -190,30 +190,30 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
 
         <Button
           type="submit"
-          className="w-full h-10 border border-slate-200 rounded-full text-sm text-slate-700 flex items-center justify-center gap-2.5 font-bold hover:bg-slate-50 transition-colors mt-2 cursor-pointer"
+          className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-slate-200 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
         >
           {isSignUp ? "Create Account" : "Login"}
         </Button>
       </form>
 
-      <div className="flex items-center gap-3 mt-2">
-        <div className="flex-1 h-px bg-slate-200" />
+      <div className="mt-2 flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-200" />
         <span className="text-xs text-slate-400">or continue with</span>
-        <div className="flex-1 h-px bg-slate-200" />
+        <div className="h-px flex-1 bg-slate-200" />
       </div>
 
       {/* Google Auth */}
-      <Button className="w-full h-10 border border-slate-200 rounded-full text-sm text-slate-700 flex items-center justify-center gap-2.5 hover:bg-slate-50 transition-colors mt-2 cursor-pointer">
+      <Button className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-slate-200 text-sm text-slate-700 transition-colors hover:bg-slate-50">
         <GoogleIcon />
         Continue with Google
       </Button>
 
-      <p className="text-center text-xs text-slate-400/80 mt-6">
+      <p className="mt-6 text-center text-xs text-slate-400/80">
         {isSignUp ? "Already have an account?" : "Don't have an account?"}
 
         <Link
           href={isSignUp ? "/sign-in" : "sign-up"}
-          className="text-slate-300 text-sm font-medium hover:text-white m-1"
+          className="m-1 text-sm font-medium text-slate-300 hover:text-white"
         >
           {isSignUp ? "Sign in" : "Create one"}
         </Link>

@@ -27,7 +27,7 @@ const FormField = <T extends FieldValues>({
       render={({ field, fieldState: { error } }) => {
         return (
           <Field>
-            <FieldLabel className="text-light-100!  font-normal!">
+            <FieldLabel className="text-light-100! font-normal!">
               {label}
             </FieldLabel>
             <Input
@@ -39,7 +39,7 @@ const FormField = <T extends FieldValues>({
             />
 
             {error && (
-              <p className="text-red-500 text-xs mt-1 px-5">{error.message}</p>
+              <p className="mt-1 px-5 text-xs text-red-500">{error.message}</p>
             )}
           </Field>
         );

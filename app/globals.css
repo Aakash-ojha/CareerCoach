@@ -132,15 +132,15 @@
 
 @layer components {
   .root-layout {
-    @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
+    @apply mx-auto my-12 flex max-w-7xl flex-col gap-12 px-16 max-sm:my-8 max-sm:px-4;
   }
 
   .auth-layout {
-    @apply flex items-center justify-center mx-auto max-w-7xl min-h-screen max-sm:px-4 max-sm:py-8;
+    @apply mx-auto flex min-h-screen max-w-7xl items-center justify-center max-sm:px-4 max-sm:py-8;
   }
 
   .input {
-    @apply rounded-full! min-h-12! px-5!;
+    @apply min-h-12! rounded-full! px-5!;
   }
 }
 

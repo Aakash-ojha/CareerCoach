@@ -126,13 +126,13 @@ function FeatureCard({ item }: any) {
     <motion.div
       variants={featureVariants}
       whileHover={{ y: -5 }}
-      className="group relative h-full flex flex-col p-6 rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-sm hover:border-blue-500/30 hover:bg-zinc-900/70 transition-all duration-300 shadow-lg overflow-hidden"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:bg-zinc-900/70"
     >
-      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-4">
-          <div className={`p-2 rounded-lg ${item.iconBg}`}>
+        <div className="mb-4 flex items-center gap-3">
+          <div className={`rounded-lg p-2 ${item.iconBg}`}>
             <Icon size={24} className={item.iconColor} />
           </div>
 
@@ -150,22 +150,22 @@ function StepCard({ item }: any) {
     <motion.div
       variants={itemVariants}
       whileHover={{ y: -6 }}
-      className="group relative h-full flex flex-col p-6 rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-sm hover:border-blue-500/30 hover:bg-zinc-900/70 transition-all duration-300 shadow-lg overflow-hidden"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:bg-zinc-900/70"
     >
-      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       <div className="relative z-10">
-        <div className="flex flex-row gap-5 items-center">
-          <div className="text-green-400 text-3xl font-bold mb-4">
+        <div className="flex flex-row items-center gap-5">
+          <div className="mb-4 text-3xl font-bold text-green-400">
             {item.step}
           </div>
 
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="mb-2 text-xl font-semibold text-white">
             {item.title}
           </h3>
         </div>
 
-        <p className="text-slate-500 leading-relaxed">{item.description}</p>
+        <p className="leading-relaxed text-slate-500">{item.description}</p>
       </div>
     </motion.div>
   );
@@ -177,16 +177,16 @@ function BenefitCard({ item }: any) {
       variants={itemVariants}
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ duration: 0.2 }}
-      className="group relative h-full flex flex-col p-6 rounded-2xl border border-white/10 bg-zinc-900/50 backdrop-blur-sm hover:border-blue-500/30 hover:bg-zinc-900/70 transition-all duration-300 shadow-lg overflow-hidden"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/50 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-blue-500/30 hover:bg-zinc-900/70"
     >
-      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <div className="absolute inset-0 rounded-2xl bg-linear-to-r from-blue-500/0 via-blue-500/5 to-cyan-500/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-      <div className="relative flex items-start gap-4 z-10">
-        <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-400/20 flex items-center justify-center">
+      <div className="relative z-10 flex items-start gap-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-green-400/20 bg-green-500/10">
           <CheckCircle className="text-green-400" size={20} />
         </div>
 
-        <p className="text-white text-base md:text-lg font-medium leading-relaxed">
+        <p className="text-base leading-relaxed font-medium text-white md:text-lg">
           {item}
         </p>
       </div>
@@ -196,7 +196,7 @@ function BenefitCard({ item }: any) {
 const looped = [...testimonials, ...testimonials];
 function TestimonialMarquee() {
   return (
-    <section className="w-full py-3 overflow-hidden bg-transparent">
+    <section className="w-full overflow-hidden bg-transparent py-3">
       {/* Marquee Container */}
       <div
         className="relative w-full overflow-hidden"
@@ -209,7 +209,7 @@ function TestimonialMarquee() {
         }}
       >
         <motion.div
-          className="flex gap-6 md:gap-10 w-max px-4"
+          className="flex w-max gap-6 px-4 md:gap-10"
           animate={{ x: ["-50%", "0%"] }}
           transition={{
             repeat: Infinity,
@@ -221,29 +221,25 @@ function TestimonialMarquee() {
           {looped.map((item, i) => (
             <div
               key={i}
-              className="
-                relative shrink-0 
-                w-75 sm:w-95 lg:w-112.5 xl:w-125
-                p-px rounded-3xl overflow-hidden group
-              "
+              className="group relative w-75 shrink-0 overflow-hidden rounded-3xl p-px sm:w-95 lg:w-112.5 xl:w-125"
             >
               {/* card body */}
-              <div className="relative h-full p-8 lg:p-10 rounded-3xl bg-zinc-900/60 backdrop-blur-md flex flex-col gap-6">
-                <div className="flex items-center gap-4 relative z-10">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-linear-to-br from-green-400 to-cyan-400 flex items-center justify-center text-zinc-950 font-bold text-sm lg:text-base">
+              <div className="relative flex h-full flex-col gap-6 rounded-3xl bg-zinc-900/60 p-8 backdrop-blur-md lg:p-10">
+                <div className="relative z-10 flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-green-400 to-cyan-400 text-sm font-bold text-zinc-950 lg:h-14 lg:w-14 lg:text-base">
                     {item.name.charAt(0)}
                   </div>
 
                   <div className="text-left">
-                    <p className="text-white font-bold text-base lg:text-xl tracking-wide">
+                    <p className="text-base font-bold tracking-wide text-white lg:text-xl">
                       {item.name}
                     </p>
-                    <p className="text-green-400/90 text-xs lg:text-sm font-mono uppercase tracking-widest mt-0.5">
+                    <p className="mt-0.5 font-mono text-xs tracking-widest text-green-400/90 uppercase lg:text-sm">
                       {item.role}
                     </p>
                   </div>
                 </div>
-                <p className="text-white text-base lg:text-0.5xl leading-relaxed relative z-10 font-medium italic text-left">
+                <p className="lg:text-0.5xl relative z-10 text-left text-base leading-relaxed font-medium text-white italic">
                   “{item.text}”
                 </p>
               </div>
@@ -256,23 +252,16 @@ function TestimonialMarquee() {
 }
 function AcePareCTA() {
   return (
-    <section className="relative mt-20 py-28 md:py-36 px-6 border bg-zinc-900/50 rounded-3xl">
+    <section className="relative mt-20 rounded-3xl border bg-zinc-900/50 px-6 py-28 md:py-36">
       {/* content */}
-      <div className="relative max-w-4xl mx-auto flex flex-col items-center text-center gap-10">
+      <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-10 text-center">
         {/* heading */}
-        <div
-          className="absolute w-72 h-52 rounded-full -z-10 pointer-events-none 
-            bg-white/30 opacity-100 
-            group-hover:bg-white/35 group-hover:h-62
-            blur-[120px] 
-            transition-all duration-1000 
-            ease-out"
-        />
+        <div className="pointer-events-none absolute -z-10 h-52 w-72 rounded-full bg-white/30 opacity-100 blur-[120px] transition-all duration-1000 ease-out group-hover:h-62 group-hover:bg-white/35" />
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white"
+          className="text-4xl font-bold tracking-tight text-white md:text-5xl lg:text-6xl"
         >
           Ready to{" "}
           <span className="bg-linear-to-r from-green-400 via-emerald-300 to-teal-400 bg-clip-text text-transparent">
@@ -286,24 +275,21 @@ function AcePareCTA() {
           initial={{ opacity: 0, y: 15 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed"
+          className="max-w-2xl text-lg leading-relaxed text-slate-400 md:text-xl"
         >
           Practice with real interview simulations, get AI feedback, and improve
           faster than ever before.
         </motion.p>
 
         {/* button */}
-        <Link href="interview">
+        <Link href="/interview/setup">
           <motion.button
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.4 }}
-            className="group relative h-12 px-8 text-lg  bg-slate-900 text-white rounded-full flex items-center gap-2 
-          after:absolute after:inset-0 after:rounded-full after:bg-green-500/20 after:blur-xl after:transition-all after:duration-500
-          hover:after:bg-green-400/40 hover:after:blur-2xl
-          transition-all duration-300 border border-slate-800 hover:border-green-500/30 hover:scale-[1.02] active:scale-95 cursor-pointer"
+            className="group relative flex h-12 cursor-pointer items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-8 text-lg text-white transition-all duration-300 after:absolute after:inset-0 after:rounded-full after:bg-green-500/20 after:blur-xl after:transition-all after:duration-500 hover:scale-[1.02] hover:border-green-500/30 hover:after:bg-green-400/40 hover:after:blur-2xl active:scale-95"
           >
             <span className="relative z-10">Start Your Mock Interview</span>
 
@@ -320,26 +306,19 @@ function AcePareCTA() {
 
 export default function Home() {
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center text-center gap-8 py-20">
+    <section className="flex min-h-screen flex-col items-center justify-center gap-8 py-20 text-center">
       {/* Hero */}
       <motion.div
-        className="space-y-6 max-w-3xl"
+        className="max-w-3xl space-y-6"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.div className="space-y-4" variants={itemVariants}>
-          <div className="flex flex-col items-center group relative">
-            <div
-              className="absolute w-72 h-52 rounded-full -z-10 pointer-events-none 
-            bg-white/30 opacity-100 
-            group-hover:bg-white/35 group-hover:h-62
-            blur-[120px] 
-            transition-all duration-1000 
-            ease-out"
-            />
+          <div className="group relative flex flex-col items-center">
+            <div className="pointer-events-none absolute -z-10 h-52 w-72 rounded-full bg-white/30 opacity-100 blur-[120px] transition-all duration-1000 ease-out group-hover:h-62 group-hover:bg-white/35" />
             <Image
-              className="will-change-transform transition-transform duration-500 hover:scale-105"
+              className="transition-transform duration-500 will-change-transform hover:scale-105"
               src="/robot-new.png"
               width={200}
               height={200}
@@ -347,21 +326,21 @@ export default function Home() {
               priority
             />
 
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+            <h1 className="text-5xl font-bold tracking-tight md:text-6xl">
               Master Your
               <span className="bg-linear-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
                 Interview Skills
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-slate-400">
+            <p className="text-xl text-slate-400 md:text-2xl">
               Get AI-powered interview coaching tailored to your dream job
             </p>
           </div>
         </motion.div>
 
         <motion.p
-          className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed"
+          className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-500"
           variants={itemVariants}
         >
           Practice with our intelligent AI interviewer, receive detailed
@@ -372,13 +351,8 @@ export default function Home() {
           className="flex justify-center pt-4"
           variants={itemVariants}
         >
-          <Link href="/interview">
-            <Button
-              className="group relative h-12 px-8 text-lg font-semibold bg-slate-900 text-white rounded-full flex items-center gap-2 
-              after:absolute after:inset-0 after:rounded-full after:bg-green-500/20 after:blur-xl after:transition-all after:duration-500
-              hover:after:bg-green-400/40 hover:after:blur-2xl
-              transition-all duration-300 border border-slate-800 hover:border-green-500/30 hover:scale-[1.02] active:scale-95 cursor-pointer"
-            >
+          <Link href="/interview/setup">
+            <Button className="group relative flex h-12 cursor-pointer items-center gap-2 rounded-full border border-slate-800 bg-slate-900 px-8 text-lg font-semibold text-white transition-all duration-300 after:absolute after:inset-0 after:rounded-full after:bg-green-500/20 after:blur-xl after:transition-all after:duration-500 hover:scale-[1.02] hover:border-green-500/30 hover:after:bg-green-400/40 hover:after:blur-2xl active:scale-95">
               <span className="relative z-10">Get Started</span>
               <ArrowRight
                 size={20}
@@ -391,7 +365,7 @@ export default function Home() {
 
       {/* Features */}
       <motion.div
-        className="grid md:grid-cols-3 gap-6 mt-20 w-full max-w-6xl"
+        className="mt-20 grid w-full max-w-6xl gap-6 md:grid-cols-3"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -402,17 +376,17 @@ export default function Home() {
       </motion.div>
 
       {/* How It Works */}
-      <section className="py-20 px-6 w-full max-w-6xl">
-        <div className="flex items-center gap-4 mb-16">
+      <section className="w-full max-w-6xl px-6 py-20">
+        <div className="mb-16 flex items-center gap-4">
           <div className="flex-1 border-t border-white/20" />
-          <h2 className="text-4xl font-bold text-white whitespace-nowrap">
+          <h2 className="text-4xl font-bold whitespace-nowrap text-white">
             How It Works
           </h2>
           <div className="flex-1 border-t border-white/20" />
         </div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+          className="grid grid-cols-1 gap-8 md:grid-cols-3"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -425,18 +399,18 @@ export default function Home() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="px-6 md:px-10 lg:px-20 py-6 w-full">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center gap-6 mb-16">
+      <section className="w-full px-6 py-6 md:px-10 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 flex items-center justify-center gap-6">
             <div className="w-full max-w-55 border-t border-white/10" />
-            <h2 className="text-4xl md:text-4xl font-bold whitespace-nowrap tracking-tight">
+            <h2 className="text-4xl font-bold tracking-tight whitespace-nowrap md:text-4xl">
               Why Choose Us
             </h2>
             <div className="w-full max-w-55 border-t border-white/10" />
           </div>
 
           <motion.div
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -450,10 +424,10 @@ export default function Home() {
       </section>
 
       {/* What Users Says */}
-      <div className="py-6 md:px-10 lg:px-10 w-full">
+      <div className="w-full py-6 md:px-10 lg:px-10">
         <div className="flex flex-row items-center gap-6">
           <div className="flex-1 border-t border-white/20" />
-          <h2 className="text-4xl font-bold text-white whitespace-nowrap">
+          <h2 className="text-4xl font-bold whitespace-nowrap text-white">
             What users Says
           </h2>
           <div className="flex-1 border-t border-white/20" />
