@@ -44,9 +44,16 @@ export function useInterviewSession(
         if (data?.session) {
           setSessionData(data.session);
 
-          setTimeRemaining(
-            data.session.timeRemaining ?? data.session.timePreference * 60,
-          );
+          const createdAt = new Date(data.session.createdAt).getTime();
+          const now = new Date().getTime();
+
+          const totalDurationInSeconds = data.session.timePreference * 60;
+
+          const elapsedSeconds = Math.floor((now - createdAt) / 1000);
+
+          const remainingSeconds = totalDurationInSeconds - elapsedSeconds;
+
+          setTimeRemaining(remainingSeconds > 0 ? remainingSeconds : 0);
         }
 
         const stream = await navigator.mediaDevices.getUserMedia({

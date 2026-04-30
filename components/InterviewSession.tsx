@@ -129,7 +129,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
                 className={`z-10 flex h-30 w-30 shrink-0 items-center justify-center rounded-full border-2 bg-linear-to-br from-slate-700 to-slate-800 text-5xl shadow-[0_0_60px_rgba(34,211,238,0.15)] transition-all duration-300 sm:h-44 sm:w-44 sm:text-8xl md:h-52 md:w-52 ${
                   isSpeaking ? "scale-105 border-cyan-400" : "border-slate-600"
                 }`}
-              >
+              >  
                 🤖
               </div>
 
