@@ -76,28 +76,34 @@ export function useInterviewSession(
   // ================= FINISH =================
   const finishInterview = async () => {
     if (isCompletedRef.current) return;
+
     setIsEvaluating(true);
 
     try {
       const response = await fetch("/api/interview/evaluate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sessionId,
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to evaluate the session");
+        throw new Error(data.error || "Evaluation failed");
       }
 
+      // optional: send to UI
       if (onFinish) onFinish(data);
+
+      setIsCompleted(true);
     } catch (error: any) {
       console.error("Evaluation Error:", error);
-      alert(error.message || "Something went wrong while evaluating.");
     } finally {
       setIsEvaluating(false);
-      setIsCompleted(true);
     }
   };
 

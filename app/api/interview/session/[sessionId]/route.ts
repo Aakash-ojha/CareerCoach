@@ -7,19 +7,10 @@ import { InterviewSession } from "@/models/InterviewSession";
  * This ensures the timer persists correctly across page refreshes.
  */
 const getRemainingTime = (session: any) => {
-  // 1. Total seconds allowed (e.g., 10 minutes * 60)
   const totalAllowedSeconds = session.timePreference * 60;
-
-  // 2. The exact moment the interview began
   const startTime = new Date(session.startedAt).getTime();
-
-  // 3. Current moment
   const now = Date.now();
-
-  // 4. Calculate how many seconds have ticked away since the start
   const elapsedSeconds = Math.floor((now - startTime) / 1000);
-
-  // 5. Subtract elapsed from total, ensuring we don't return a negative number
   return Math.max(totalAllowedSeconds - elapsedSeconds, 0);
 };
 
@@ -30,7 +21,6 @@ export async function GET(
   try {
     await connectDB();
 
-    // Resolve params for Next.js 15+ compatibility
     const { sessionId } = await params;
 
     if (!sessionId) {
@@ -40,24 +30,12 @@ export async function GET(
       );
     }
 
-    // Fetch the session from MongoDB
     const session = await InterviewSession.findById(sessionId);
 
     if (!session) {
       return NextResponse.json(
         { success: false, error: "Session not found" },
         { status: 404 },
-      );
-    }
-
-    // 🛑 Block access if the session is already completed
-    if (session.status === "completed") {
-      return NextResponse.json(
-        {
-          success: false,
-          error: "This interview session has already been completed.",
-        },
-        { status: 400 }, // 400 Bad Request or 403 Forbidden
       );
     }
 

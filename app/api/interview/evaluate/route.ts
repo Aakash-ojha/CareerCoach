@@ -3,71 +3,264 @@ import Groq from "groq-sdk";
 import { connectDB } from "@/lib/db";
 import { InterviewSession } from "@/models/InterviewSession";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
+    // =========================
+    // CONNECT DATABASE
+    // =========================
     await connectDB();
 
-    // We expect only the sessionId from the frontend
     const { sessionId } = await req.json();
 
+    // =========================
+    // VALIDATION
+    // =========================
     if (!sessionId) {
       return NextResponse.json(
-        { error: "Session ID is required" },
+        {
+          success: false,
+          error: "Session ID is required",
+        },
         { status: 400 },
       );
     }
 
-    // Fetch the session directly from the database
+    // =========================
+    // FETCH SESSION
+    // =========================
     const session = await InterviewSession.findById(sessionId);
+
     if (!session) {
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Interview session not found",
+        },
+        { status: 404 },
+      );
     }
 
-    // Safely extract the messages array and convert to history format
-    const messages = Array.isArray(session.messages) ? session.messages : [];
+    // Prevent duplicate evaluation
+    if (session.status === "completed" && session.report) {
+      return NextResponse.json({
+        success: true,
+        report: session.report,
+        score: session.score,
+        message: "Session already evaluated",
+      });
+    }
 
-    const history = messages.map((m: any) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    // =========================
+    // EARLY EXIT FOR INCOMPLETE / CUT SHORT SESSIONS
+    // =========================
+    const userMessages = session.messages.filter((m: any) => m.role === "user");
+    if (userMessages.length === 0) {
+      const emptyReport = {
+        score: 0,
+        confidenceLevel: "Low",
+        strengths: ["None"],
+        weaknesses: [
+          "Interview session was exited early without providing any answers.",
+        ],
+        communication: "No responses were recorded to evaluate.",
+        technicalFeedback: "No answers provided.",
+        finalSuggestion:
+          "Start a new session and complete the interview questions to receive a valid report.",
+      };
 
-    const response = await groq.chat.completions.create({
+      const updatedSession = await InterviewSession.findByIdAndUpdate(
+        sessionId,
+        {
+          score: 0,
+          report: emptyReport,
+          status: "completed",
+        },
+        { new: true },
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: "Interview session was cut short. Evaluated as incomplete.",
+        report: emptyReport,
+        score: 0,
+        sessionId: updatedSession?._id || sessionId,
+        status: "completed",
+      });
+    }
+
+    // =========================
+    // BUILD TRANSCRIPT
+    // =========================
+    const transcript = session.messages
+      .map(
+        (msg: any) =>
+          `${msg.role === "assistant" ? "INTERVIEWER" : "CANDIDATE"}: ${msg.content}`,
+      )
+      .join("\n");
+
+    if (!transcript || transcript.trim().length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "No interview messages found to evaluate",
+        },
+        { status: 400 },
+      );
+    }
+
+    // =========================
+    // AI PROMPT
+    // =========================
+    const evaluationPrompt = `
+You are an expert senior technical interviewer.
+
+Analyze the following interview transcript and evaluate the candidate.
+
+Return ONLY valid JSON.
+Do not add markdown.
+Do not add explanation.
+Do not wrap in triple backticks.
+
+Required JSON format:
+
+{
+  "score": number,
+  "strengths": [
+    "string",
+    "string",
+    "string"
+  ],
+  "weaknesses": [
+    "string",
+    "string",
+    "string"
+  ],
+  "communication": "string",
+  "technicalFeedback": "string",
+  "confidenceLevel": "Low / Medium / High",
+  "finalSuggestion": "string"
+}
+
+Evaluation Rules:
+- score must be between 0 and 100
+- strengths must be practical observations
+- weaknesses must be constructive
+- technicalFeedback must evaluate actual answer quality
+- communication must evaluate clarity and structure
+- confidenceLevel should reflect candidate confidence
+- finalSuggestion should be specific and useful
+
+Interview Details:
+Topic: ${session.topic}
+Domain: ${session.domain}
+Difficulty: ${session.difficulty}
+
+Interview Transcript:
+${transcript}
+`;
+
+    // =========================
+    // GROQ AI CALL
+    // =========================
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.2,
+      max_tokens: 1000,
       messages: [
         {
           role: "system",
-          content: `You are an expert career coach. Analyze the interview transcript for ${session.topic || "the interview"} at ${session.difficulty || "medium"} level.
-Provide a JSON response with these keys: 
-"score" (number 0-100), 
-"feedback" (string), 
-"strengths" (array), 
-"weaknesses" (array).`,
+          content: evaluationPrompt,
         },
-        ...history, // This will no longer throw an error since it is safely extracted
       ],
-      model: "llama-3.3-70b-versatile",
-      response_format: { type: "json_object" },
     });
 
-    const contentText = response.choices[0]?.message?.content;
-    if (!contentText) {
-      throw new Error("Failed to generate evaluation from Groq");
+    const rawResponse = completion.choices[0]?.message?.content;
+
+    if (!rawResponse) {
+      throw new Error("No evaluation response received from AI");
     }
 
-    const result = JSON.parse(contentText);
+    // =========================
+    // SANITIZE & SAFE JSON PARSE
+    // =========================
+    let cleanedResponse = rawResponse.trim();
 
-    // Update the session in DB as completed
-    await InterviewSession.findByIdAndUpdate(sessionId, {
-      $set: { status: "completed", endedAt: new Date() },
-    });
+    // Strip markdown formatting if the model included it
+    if (cleanedResponse.startsWith("```json")) {
+      cleanedResponse = cleanedResponse.slice(7);
+    } else if (cleanedResponse.startsWith("```")) {
+      cleanedResponse = cleanedResponse.slice(3);
+    }
 
+    if (cleanedResponse.endsWith("```")) {
+      cleanedResponse = cleanedResponse.slice(0, -3);
+    }
+
+    cleanedResponse = cleanedResponse.trim();
+
+    let parsedReport;
+
+    try {
+      parsedReport = JSON.parse(cleanedResponse);
+    } catch (parseError) {
+      console.error("JSON Parse Failed for response:", rawResponse);
+      throw new Error("Failed to parse AI evaluation response");
+    }
+
+    // =========================
+    // SAVE REPORT TO DATABASE
+    // =========================
+    const updatedSession = await InterviewSession.findByIdAndUpdate(
+      sessionId,
+      {
+        score: parsedReport.score || 0,
+        report: parsedReport,
+        status: "completed",
+      },
+      { new: true },
+    );
+
+    if (!updatedSession) {
+      throw new Error("Failed to update interview session");
+    }
+
+    // =========================
+    // SUCCESS RESPONSE
+    // =========================
     return NextResponse.json({
       success: true,
-      ...result,
+      message: "Interview evaluated successfully",
+      report: parsedReport,
+      score: parsedReport.score || 0,
+      sessionId: updatedSession._id,
+      status: updatedSession.status,
     });
   } catch (error: any) {
-    console.error("Evaluation API error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Evaluation Route Error:", error);
+
+    let errorMessage =
+      error.message || "Something went wrong during evaluation";
+
+    if (error.message?.includes("GROQ_API_KEY")) {
+      errorMessage = "Missing GROQ API key configuration";
+    } else if (error.message?.includes("401")) {
+      errorMessage = "Groq authentication failed";
+    } else if (error.message?.includes("rate")) {
+      errorMessage = "Groq rate limit exceeded. Please try again shortly";
+    } else if (error.message?.includes("network")) {
+      errorMessage = "Network issue while contacting AI service";
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }
