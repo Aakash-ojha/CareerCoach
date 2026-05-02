@@ -50,6 +50,17 @@ export async function GET(
       );
     }
 
+    // 🛑 Block access if the session is already completed
+    if (session.status === "completed") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "This interview session has already been completed.",
+        },
+        { status: 400 }, // 400 Bad Request or 403 Forbidden
+      );
+    }
+
     return NextResponse.json({
       success: true,
       session: {

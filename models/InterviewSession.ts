@@ -63,6 +63,10 @@ const InterviewSessionSchema = new Schema(
       type: Object,
       default: null,
     },
+    startedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );

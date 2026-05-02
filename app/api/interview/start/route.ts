@@ -2,66 +2,90 @@ import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { connectDB } from "@/lib/db";
 import { InterviewSession } from "@/models/InterviewSession";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token")?.value;
+    const { sessionId } = await req.json();
 
-    if (!token) {
+    if (!sessionId) {
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
+        { success: false, error: "Session ID is required" },
+        { status: 400 },
       );
     }
 
-    // 4. Decode the token to get the REAL userId
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jwtVerify(token, secret);
-    const authenticatedUserId = payload.id as string;
+    const session = await InterviewSession.findById(sessionId);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: "Session not found" },
+        { status: 404 },
+      );
+    }
 
-    const { topic, difficulty, timePreference } = await req.json();
+    // SET START TIME (only once)
+    if (!session.startedAt) {
+      session.startedAt = new Date();
+      session.status = "active";
+      await session.save();
+    }
 
-    const response = await groq.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: `
-           You are a Senior Technical Interviewer. Start a ${difficulty} level interview on the topic of ${topic}. The interview duration is ${timePreference} minutes. Introduce yourself briefly and ask ONLY the first interview question.
-          `,
-        },
-      ],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.7,
-    });
+    // GENERATE FIRST QUESTION (only if not already generated)
+    let firstQuestion = "";
 
-    const firstQuestion = response.choices[0].message.content;
+    // Check if the first message is already an assistant message (question already generated)
+    const hasFirstQuestion =
+      session.messages.length > 0 && session.messages[0].role === "assistant";
 
-    const session = await InterviewSession.create({
-      userId: authenticatedUserId,
-      topic,
-      difficulty,
-      timePreference,
-      status: "active",
-      messages: [
-        {
-          role: "assistant",
-          content: firstQuestion,
-        },
-      ],
-    });
+    if (!hasFirstQuestion) {
+      // Generate the first question using Groq
+      const response = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `You are a technical interviewer. You are conducting a ${session.difficulty} level interview on the topic: "${session.topic}".
 
+Your task: Ask ONLY the first interview question. Be concise and clear. Do not ask multiple questions in one response.
+
+Remember: This is the opening question, so make it welcoming and set the tone for the interview.`,
+          },
+          {
+            role: "user",
+            content:
+              "Let's begin the interview. What's your first question for me?",
+          },
+        ],
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.7,
+        max_tokens: 200,
+      });
+
+      firstQuestion = response.choices[0].message.content || "";
+
+      if (!firstQuestion) {
+        throw new Error("Failed to generate first question");
+      }
+
+      // ✅ 3. SAVE THE FIRST QUESTION TO SESSION
+      session.messages.push({
+        role: "assistant",
+        content: firstQuestion,
+      });
+
+      await session.save();
+    } else {
+      // First question already exists, retrieve it
+      firstQuestion = session.messages[0].content;
+    }
+
+    // ✅ 4. RETURN RESPONSE
     return NextResponse.json({
       success: true,
       sessionId: session._id,
+      startedAt: session.startedAt,
       question: firstQuestion,
       config: {
         topic: session.topic,
@@ -70,10 +94,11 @@ export async function POST(req: Request) {
       },
     });
   } catch (error: any) {
+    console.error("Start interview error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message,
+        error: error.message || "Failed to start interview",
       },
       { status: 500 },
     );

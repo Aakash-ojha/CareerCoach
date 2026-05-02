@@ -1,51 +1,167 @@
 import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
-import { connectDB } from "@/lib/db"; // Ensure you have a DB connection helper
+import { connectDB } from "@/lib/db";
 import { InterviewSession } from "@/models/InterviewSession";
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    // 1. Get sessionId from the request
-    const { userText, sessionId } = await req.json();
+    const { sessionId, message } = await req.json();
 
-    // 2. Fetch the session from MongoDB to get history and config
-    const session = await InterviewSession.findById(sessionId);
-    if (!session) {
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    // ✅ 1. VALIDATION
+    if (!sessionId || !message) {
+      return NextResponse.json(
+        { success: false, error: "Session ID and message are required" },
+        { status: 400 },
+      );
     }
 
-    const groqMessages = [
+    if (typeof message !== "string" || message.trim().length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Message cannot be empty" },
+        { status: 400 },
+      );
+    }
+
+    // ✅ 2. FETCH SESSION
+    const session = await InterviewSession.findById(sessionId);
+    if (!session) {
+      return NextResponse.json(
+        { success: false, error: "Session not found" },
+        { status: 404 },
+      );
+    }
+
+    // ✅ 3. VERIFY SESSION IS ACTIVE
+    if (session.status !== "active") {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Session is ${session.status}, cannot add messages`,
+        },
+        { status: 400 },
+      );
+    }
+
+    // ✅ 4. SAVE USER MESSAGE TO DATABASE
+    const userMessage = {
+      role: "user" as const,
+      content: message.trim(),
+      timestamp: new Date(),
+    };
+
+    const sessionAfterUserMsg = await InterviewSession.findByIdAndUpdate(
+      sessionId,
       {
-        role: "system",
-        content: `You are a technical interviewer. The candidate is interviewing for a ${session.difficulty} level position regarding ${session.topic}. 
-        Acknowledge their answer briefly, then ask the next logical technical question. Max 2 sentences.`,
+        $push: {
+          messages: userMessage,
+        },
       },
-      ...session.messages.map((m: any) => ({
-        role: m.role,
-        content: m.content,
-      })),
-      { role: "user", content: userText },
-    ];
+      { new: true },
+    );
+
+    if (!sessionAfterUserMsg) {
+      throw new Error("Failed to save user message");
+    }
+
+    // ✅ 5. BUILD CONVERSATION HISTORY (including the just-saved message)
+    const conversationHistory = sessionAfterUserMsg.messages.map((m: any) => ({
+      role: m.role,
+      content: m.content,
+    }));
+
+    // ✅ 6. GENERATE NEXT QUESTION/FEEDBACK FROM GROQ
+    const systemPrompt = `You are a professional technical interviewer conducting a ${session.difficulty} level interview on "${session.topic}".
+
+Your responsibilities:
+- Evaluate the candidate's answer constructively
+- Ask clear, relevant follow-up questions
+- Maintain a professional, encouraging tone
+- Provide brief feedback before asking the next question
+- Ask 1 question per response only
+- If the candidate's answers are weak, gently probe deeper
+
+Format your response as:
+1. Brief acknowledgment of their answer
+2. One follow-up question
+
+Keep responses concise (under 150 words).`;
 
     const response = await groq.chat.completions.create({
-      messages: groqMessages,
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        ...conversationHistory,
+      ],
       model: "llama-3.3-70b-versatile",
-      temperature: 0.5,
+      temperature: 0.7,
+      max_tokens: 300,
     });
 
-    const aiQuestion = response.choices[0].message.content;
+    const nextResponse = response.choices[0]?.message?.content;
 
-    session.messages.push({ role: "user", content: userText });
-    session.messages.push({ role: "assistant", content: aiQuestion });
-    await session.save();
+    if (!nextResponse) {
+      throw new Error("Failed to generate response from Groq");
+    }
 
-    return NextResponse.json({ question: aiQuestion });
+    // ✅ 7. SAVE ASSISTANT RESPONSE TO DATABASE
+    const assistantMessage = {
+      role: "assistant" as const,
+      content: nextResponse.trim(),
+      timestamp: new Date(),
+    };
+
+    const updatedSession = await InterviewSession.findByIdAndUpdate(
+      sessionId,
+      {
+        $push: {
+          messages: assistantMessage,
+        },
+      },
+      { new: true },
+    );
+
+    if (!updatedSession) {
+      throw new Error("Failed to save assistant response");
+    }
+
+    // ✅ 8. RETURN RESPONSE
+    return NextResponse.json({
+      success: true,
+      reply: nextResponse.trim(),
+      sessionId: updatedSession._id,
+      messageCount: updatedSession.messages.length,
+      status: updatedSession.status,
+    });
   } catch (error: any) {
-    console.error("Chat Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Chat route error:", error);
+
+    // ✅ 9. BETTER ERROR MESSAGES
+    let errorMessage = error.message || "Failed to process chat message";
+
+    if (error.message?.includes("GROQ_API_KEY")) {
+      errorMessage = "API configuration error - check GROQ_API_KEY";
+    } else if (error.message?.includes("401")) {
+      errorMessage = "Authentication error with Groq API";
+    } else if (error.message?.includes("rate")) {
+      errorMessage = "Rate limit exceeded - please try again in a moment";
+    } else if (error.message?.includes("network")) {
+      errorMessage = "Network error - please check your connection";
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: errorMessage,
+      },
+      { status: 500 },
+    );
   }
 }

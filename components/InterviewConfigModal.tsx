@@ -68,7 +68,7 @@ const InterviewConfigModal = ({
     try {
       setLoading(true);
 
-      const res = await fetch("/api/interview/start", {
+      const res = await fetch("/api/interview/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
