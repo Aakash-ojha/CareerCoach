@@ -11,6 +11,8 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+import { signIn } from "next-auth/react";
+
 type AuthPageType = "sign-in" | "sign-up";
 
 const authformSchema = (typed: AuthPageType) => {
@@ -104,8 +106,7 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
         router.push("/");
       }
     } catch (err) {
-      console.log(err);
-
+      // console.error(err);
       toast.error(`There was an error : ${err}`);
     }
   }
@@ -203,7 +204,11 @@ const AuthForm = ({ typed }: { typed: AuthPageType }) => {
       </div>
 
       {/* Google Auth */}
-      <Button className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-slate-200 text-sm text-slate-700 transition-colors hover:bg-slate-50">
+      <Button
+        type="button"
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+        className="mt-2 flex h-10 w-full cursor-pointer items-center justify-center gap-2.5 rounded-full border border-slate-200 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+      >
         <GoogleIcon />
         Continue with Google
       </Button>

@@ -53,7 +53,7 @@ export default function Page({ params }: Props) {
   }, [id]);
 
   const handleFinish = (report: any) => {
-    console.log("Final Report:", report);
+    // console.log("Final Report:", report);
 
     // after interview finishes → show completed UI
     setIsCompleted(true);

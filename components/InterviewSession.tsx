@@ -64,7 +64,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
   if (permissionGranted === null) {
     return (
       <div className="flex h-screen w-full items-center justify-center text-white">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-cyan-500 border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-500 border-t-transparent" />
       </div>
     );
   }
@@ -76,7 +76,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
           <div className="mb-4 text-2xl font-bold text-green-500">
             Permission Required
           </div>
-          <p className="mb-6 text-slate-400">
+          <p className="mb-6 text-green-300">
             Camera and microphone access is required to start the interview.
           </p>
 
@@ -94,13 +94,13 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
   return (
     <>
       {countdown !== null && (
-        <div className="bg-background/90 fixed inset-0 z-100 flex h-screen w-screen flex-col items-center justify-center backdrop-blur-sm">
+        <div className="bg-background/90 fixed inset-0 z-100 flex h-screen w-screen flex-col items-center justify-center text-green-400 backdrop-blur-sm">
           <h2 className="mb-4 text-3xl font-bold">Starting in</h2>
-          <span className="text-primary animate-ping text-6xl font-extrabold">
+          <span className="animate-ping text-6xl font-extrabold text-green-400">
             {countdown}
           </span>
 
-          <span className="mt-6 text-2xl">
+          <span className="mt-6 text-2xl text-green-300">
             Note: Leaving the page will end your interview
           </span>
         </div>
@@ -180,7 +180,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
           <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 sm:gap-8 lg:grid-cols-2">
             {/* AI PANEL */}
 
-            <Card className="relative min-h-75 overflow-hidden rounded-2xl border border-slate-700 bg-slate-800/50 shadow-2xl backdrop-blur-sm sm:min-h-125 sm:rounded-3xl">
+            <Card className="relative min-h-75 overflow-hidden rounded-2xl border border-slate-600 bg-slate-800/50 shadow-2xl backdrop-blur-sm sm:min-h-125 sm:rounded-3xl">
               <CardContent className="relative flex h-full flex-col items-center justify-center p-4 text-center sm:p-8">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent opacity-40" />
 
@@ -219,7 +219,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
                 />
 
                 {!isCamOn && (
-                  <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-slate-800">
+                  <div className="absolute inset-0 flex h-full w-full flex-col items-center justify-center bg-slate-800/50 shadow-2xl backdrop-blur-sm">
                     <div className="flex h-32 w-32 items-center justify-center rounded-full border-2 border-slate-600 bg-slate-700 sm:h-40 sm:w-40">
                       <User className="h-12 w-12 text-slate-400 sm:h-20 sm:w-20" />
                     </div>
@@ -249,7 +249,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="mb-6 rounded-xl border-2 border-l-4 border-slate-700 border-l-cyan-500 bg-slate-800/50 p-4 backdrop-blur-sm sm:mb-8 sm:rounded-2xl sm:p-5"
+                className="mb-6 rounded-xl border-2 border-l-4 border-slate-600 border-l-cyan-500 bg-slate-800/50 p-4 backdrop-blur-sm sm:mb-8 sm:rounded-2xl sm:p-5"
               >
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-xs font-bold tracking-widest text-cyan-400 uppercase">
@@ -282,7 +282,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
               onClick={toggleMic}
               className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all sm:h-14 sm:w-14 ${
                 isMicOn
-                  ? "border-green-600 bg-slate-700 text-white hover:bg-slate-600"
+                  ? "border-slate-600 bg-slate-700 text-white hover:bg-slate-600"
                   : "border-red-500/50 bg-red-500/20 text-red-400"
               }`}
               title={isMicOn ? "Mute" : "Unmute"}
@@ -296,7 +296,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
               onClick={toggleCam}
               className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all sm:h-14 sm:w-14 ${
                 isCamOn
-                  ? "border-green-600 bg-slate-700 text-white hover:bg-slate-600"
+                  ? "border-slate-600 bg-slate-700 text-white hover:bg-slate-600"
                   : "border-red-500/50 bg-red-500/20 text-red-400"
               }`}
               title={isCamOn ? "Turn off camera" : "Turn on camera"}

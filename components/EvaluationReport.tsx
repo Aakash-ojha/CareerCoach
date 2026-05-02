@@ -54,7 +54,7 @@ export default function EvaluationReport({
             Interview <span className="text-green-400">Feedback</span>
           </h1>
 
-          <p className="mt-3 text-sm tracking-widest text-slate-400 uppercase">
+          <p className="mt-3 text-sm tracking-widest text-green-600 uppercase">
             {session?.topic} • {session?.difficulty}
           </p>
         </header>
@@ -83,7 +83,7 @@ export default function EvaluationReport({
 
           <Card className="border-slate-700 bg-zinc-900">
             <CardContent className="pt-6">
-              <Target className="mb-2 text-yellow-400" size={28} />
+              <Target className="mb-2 text-green-600" size={28} />
               <p className="text-xs text-slate-500 uppercase">Domain</p>
               <h2 className="text-2xl font-bold">
                 {session?.domain || "General"}
