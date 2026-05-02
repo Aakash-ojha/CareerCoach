@@ -9,16 +9,14 @@ const groq = new Groq({
 
 export async function POST(req: Request) {
   try {
-    // =========================
     // CONNECT DATABASE
-    // =========================
+
     await connectDB();
 
     const { sessionId } = await req.json();
 
-    // =========================
     // VALIDATION
-    // =========================
+
     if (!sessionId) {
       return NextResponse.json(
         {
@@ -29,9 +27,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // =========================
     // FETCH SESSION
-    // =========================
+
     const session = await InterviewSession.findById(sessionId);
 
     if (!session) {
@@ -54,9 +51,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // =========================
     // EARLY EXIT FOR INCOMPLETE / CUT SHORT SESSIONS
-    // =========================
+
     const userMessages = session.messages.filter((m: any) => m.role === "user");
     if (userMessages.length === 0) {
       const emptyReport = {
@@ -92,9 +88,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // =========================
     // BUILD TRANSCRIPT
-    // =========================
+
     const transcript = session.messages
       .map(
         (msg: any) =>
@@ -112,9 +107,8 @@ export async function POST(req: Request) {
       );
     }
 
-    // =========================
     // AI PROMPT
-    // =========================
+
     const evaluationPrompt = `
 You are an expert senior technical interviewer.
 
@@ -163,9 +157,8 @@ Interview Transcript:
 ${transcript}
 `;
 
-    // =========================
     // GROQ AI CALL
-    // =========================
+
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       temperature: 0.2,
@@ -184,9 +177,8 @@ ${transcript}
       throw new Error("No evaluation response received from AI");
     }
 
-    // =========================
     // SANITIZE & SAFE JSON PARSE
-    // =========================
+
     let cleanedResponse = rawResponse.trim();
 
     // Strip markdown formatting if the model included it
@@ -211,9 +203,8 @@ ${transcript}
       throw new Error("Failed to parse AI evaluation response");
     }
 
-    // =========================
     // SAVE REPORT TO DATABASE
-    // =========================
+
     const updatedSession = await InterviewSession.findByIdAndUpdate(
       sessionId,
       {
@@ -228,9 +219,8 @@ ${transcript}
       throw new Error("Failed to update interview session");
     }
 
-    // =========================
     // SUCCESS RESPONSE
-    // =========================
+
     return NextResponse.json({
       success: true,
       message: "Interview evaluated successfully",

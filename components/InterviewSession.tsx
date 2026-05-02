@@ -156,7 +156,7 @@ export default function InterviewSession({ sessionId, config, onFinish }: any) {
 
             {/* Timer Display */}
 
-            {timeRemaining > 0 && (
+            {timeRemaining !== null && timeRemaining > 0 && (
               <motion.div
                 animate={{
                   scale: timeRemaining < 60 ? [1, 1.05, 1] : 1,

@@ -20,7 +20,6 @@ const TopicSchema = new mongoose.Schema({
   },
 });
 
-// This ensures we don't get duplicate topics in the same domain
 TopicSchema.index({ domain: 1, name: 1 }, { unique: true });
 
 export const Topic =

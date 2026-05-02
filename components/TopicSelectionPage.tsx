@@ -133,6 +133,7 @@ export default function TopicSelectionPage() {
         {/* MODAL TRIGGER */}
         {isModalOpen && (
           <InterviewConfigModal
+            key={selectedTopic}
             isModelOpen={isModalOpen}
             setIsModelOpen={handleCloseModal}
             selectedTopic={selectedTopic}

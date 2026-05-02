@@ -46,11 +46,6 @@ const InterviewConfigModal = ({
   const [time, setTime] = useState("10");
   const [loading, setLoading] = useState(false);
 
-  // Sync topic when selectedTopic changes
-  useEffect(() => {
-    setTopicInput(selectedTopic || "");
-  }, [selectedTopic]);
-
   const isSelectedTopic = !!selectedTopic;
 
   const handleSubmit = async (e: FormEvent) => {

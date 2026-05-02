@@ -69,7 +69,7 @@ Remember: This is the opening question, so make it welcoming and set the tone fo
         throw new Error("Failed to generate first question");
       }
 
-      // ✅ 3. SAVE THE FIRST QUESTION TO SESSION
+      // SAVE THE FIRST QUESTION TO SESSION
       session.messages.push({
         role: "assistant",
         content: firstQuestion,
@@ -81,7 +81,7 @@ Remember: This is the opening question, so make it welcoming and set the tone fo
       firstQuestion = session.messages[0].content;
     }
 
-    // ✅ 4. RETURN RESPONSE
+    //  RETURN RESPONSE
     return NextResponse.json({
       success: true,
       sessionId: session._id,

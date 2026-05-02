@@ -16,48 +16,40 @@ export default function FeedbackPage({
   const [loading, setLoading] = useState(true);
   const [evaluating, setEvaluating] = useState(false);
 
-  const fetchSession = async () => {
-    const res = await fetch(`/api/interview/session/${id}`);
-    const data = await res.json();
-    return data?.session;
-  };
-
-  const evaluateIfNeeded = async (sessionData: any) => {
-    if (sessionData?.report) return sessionData;
-
-    setEvaluating(true);
-
-    const evalRes = await fetch("/api/interview/evaluate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ sessionId: id }),
-    });
-
-    const evalData = await evalRes.json();
-
-    if (!evalData.success) {
-      setEvaluating(false);
-      return sessionData;
-    }
-
-    // Re-fetch updated session with the report generated
-    const updated = await fetchSession();
-    setEvaluating(false);
-
-    return updated;
-  };
-
   useEffect(() => {
+    const fetchSession = async () => {
+      const res = await fetch(`/api/interview/session/${id}`);
+      const data = await res.json();
+      return data?.session;
+    };
+
+    const evaluateIfNeeded = async (sessionData: any) => {
+      if (sessionData?.report) return sessionData;
+
+      setEvaluating(true);
+
+      try {
+        const evalRes = await fetch("/api/interview/evaluate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId: id }),
+        });
+
+        const evalData = await evalRes.json();
+
+        if (!evalData.success) return sessionData;
+
+        return await fetchSession();
+      } finally {
+        setEvaluating(false);
+      }
+    };
+
     const load = async () => {
       try {
         let sessionData = await fetchSession();
 
-        if (!sessionData) {
-          setLoading(false);
-          return;
-        }
+        if (!sessionData) return;
 
         sessionData = await evaluateIfNeeded(sessionData);
 

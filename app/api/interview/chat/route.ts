@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     const { sessionId, message } = await req.json();
 
-    // ✅ 1. VALIDATION
+    // VALIDATION
     if (!sessionId || !message) {
       return NextResponse.json(
         { success: false, error: "Session ID and message are required" },
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ 2. FETCH SESSION
+    // FETCH SESSION
     const session = await InterviewSession.findById(sessionId);
     if (!session) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ 3. VERIFY SESSION IS ACTIVE
+    // VERIFY SESSION IS ACTIVE
     if (session.status !== "active") {
       return NextResponse.json(
         {
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // ✅ 4. SAVE USER MESSAGE TO DATABASE
+    // SAVE USER MESSAGE TO DATABASE
     const userMessage = {
       role: "user" as const,
       content: message.trim(),
@@ -69,13 +69,13 @@ export async function POST(req: Request) {
       throw new Error("Failed to save user message");
     }
 
-    // ✅ 5. BUILD CONVERSATION HISTORY (including the just-saved message)
+    // BUILD CONVERSATION HISTORY (including the just-saved message)
     const conversationHistory = sessionAfterUserMsg.messages.map((m: any) => ({
       role: m.role,
       content: m.content,
     }));
 
-    // ✅ 6. GENERATE NEXT QUESTION/FEEDBACK FROM GROQ
+    //  GENERATE NEXT QUESTION/FEEDBACK FROM GROQ
     const systemPrompt = `You are a professional technical interviewer conducting a ${session.difficulty} level interview on "${session.topic}".
 
 Your responsibilities:
@@ -111,7 +111,7 @@ Keep responses concise (under 150 words).`;
       throw new Error("Failed to generate response from Groq");
     }
 
-    // ✅ 7. SAVE ASSISTANT RESPONSE TO DATABASE
+    // SAVE ASSISTANT RESPONSE TO DATABASE
     const assistantMessage = {
       role: "assistant" as const,
       content: nextResponse.trim(),
@@ -132,7 +132,7 @@ Keep responses concise (under 150 words).`;
       throw new Error("Failed to save assistant response");
     }
 
-    // ✅ 8. RETURN RESPONSE
+    // RETURN RESPONSE
     return NextResponse.json({
       success: true,
       reply: nextResponse.trim(),
@@ -143,7 +143,7 @@ Keep responses concise (under 150 words).`;
   } catch (error: any) {
     console.error("Chat route error:", error);
 
-    // ✅ 9. BETTER ERROR MESSAGES
+    // BETTER ERROR MESSAGES
     let errorMessage = error.message || "Failed to process chat message";
 
     if (error.message?.includes("GROQ_API_KEY")) {

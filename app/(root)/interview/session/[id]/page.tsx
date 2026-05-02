@@ -31,11 +31,11 @@ export default function Page({ params }: Props) {
 
         const session = data.session;
 
-        // ✅ if interview already completed
+        //  if interview already completed
         if (session.status === "completed" || session.isCompleted === true) {
           setIsCompleted(true);
         } else {
-          // ✅ otherwise show InterviewSession
+          // otherwise show InterviewSession
           setIsCompleted(false);
         }
 
